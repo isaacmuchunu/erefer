@@ -13,6 +13,16 @@ use App\Policies\DashboardPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Failed;
+use Illuminate\Auth\Events\Logout;
+use Illuminate\Auth\Events\Lockout;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Events\Verified;
+use Illuminate\Auth\Events\Attempting;
+use App\Listeners\AuthenticationEventListener;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -34,6 +44,16 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerPolicies();
+        
+        // Register authentication event listeners
+        Event::listen(Login::class, [AuthenticationEventListener::class, 'handleLogin']);
+        Event::listen(Failed::class, [AuthenticationEventListener::class, 'handleFailed']);
+        Event::listen(Logout::class, [AuthenticationEventListener::class, 'handleLogout']);
+        Event::listen(Lockout::class, [AuthenticationEventListener::class, 'handleLockout']);
+        Event::listen(PasswordReset::class, [AuthenticationEventListener::class, 'handlePasswordReset']);
+        Event::listen(Registered::class, [AuthenticationEventListener::class, 'handleRegistered']);
+        Event::listen(Verified::class, [AuthenticationEventListener::class, 'handleVerified']);
+        Event::listen(Attempting::class, [AuthenticationEventListener::class, 'handleAttempting']);
 
         // Define Gates for role-based permissions
         
