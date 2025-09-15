@@ -33,6 +33,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'doctor' => \App\Http\Middleware\DoctorMiddleware::class,
             'ambulance' => \App\Http\Middleware\AmbulanceMiddleware::class,
             'audit' => \App\Http\Middleware\AuditMiddleware::class,
+            'webhook.verify' => \App\Http\Middleware\WebhookVerify::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
