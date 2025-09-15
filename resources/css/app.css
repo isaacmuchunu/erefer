@@ -1,0 +1,481 @@
+@import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+@plugin 'tailwindcss-animate';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+    --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-heading: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+
+    --radius-lg: var(--radius);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-sm: calc(var(--radius) - 4px);
+
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+    /* ProHealth Theme Colors */
+    --prohealth-primary: #274760;
+    --prohealth-accent: #307BC4;
+    --prohealth-secondary: #636363;
+    --prohealth-light-blue: #86BBF1;
+    --prohealth-bg-light: #D2EAEF;
+    --prohealth-white: #FFFFFF;
+    --prohealth-border: #BCBCBC;
+    --prohealth-ternary: #AAA;
+
+    /* Convert to OKLCH for Tailwind compatibility */
+    --background: oklch(1 0 0); /* white */
+    --foreground: oklch(0.3 0.02 240); /* #274760 - ProHealth primary */
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.3 0.02 240);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.3 0.02 240);
+    --primary: oklch(0.3 0.02 240); /* #274760 - ProHealth primary */
+    --primary-foreground: oklch(1 0 0);
+    --secondary: oklch(0.95 0.005 240); /* light gray */
+    --secondary-foreground: oklch(0.3 0.02 240);
+    --muted: oklch(0.95 0.005 240);
+    --muted-foreground: oklch(0.45 0.01 240); /* #636363 - ProHealth secondary */
+    --accent: oklch(0.6 0.15 240); /* #307BC4 - ProHealth accent */
+    --accent-foreground: oklch(1 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --destructive-foreground: oklch(1 0 0);
+    --border: oklch(0.9 0.005 240);
+    --input: oklch(0.95 0.005 240);
+    --ring: oklch(0.6 0.15 240); /* ProHealth accent */
+    --chart-1: oklch(0.6 0.15 240); /* ProHealth accent */
+    --chart-2: oklch(0.7 0.1 200); /* ProHealth light blue */
+    --chart-3: oklch(0.3 0.02 240); /* ProHealth primary */
+    --chart-4: oklch(0.8 0.05 180);
+    --chart-5: oklch(0.85 0.03 160);
+    --radius: 1.5rem; /* ProHealth uses larger radius (24px) */
+    --sidebar: oklch(0.98 0.005 240);
+    --sidebar-foreground: oklch(0.3 0.02 240);
+    --sidebar-primary: oklch(0.3 0.02 240);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(0.6 0.15 240);
+    --sidebar-accent-foreground: oklch(1 0 0);
+    --sidebar-border: oklch(0.9 0.005 240);
+    --sidebar-ring: oklch(0.6 0.15 240);
+}
+
+.dark {
+    /* ProHealth Dark Theme - maintaining healthcare professional aesthetic */
+    --background: oklch(0.15 0.01 240); /* dark blue-gray */
+    --foreground: oklch(0.95 0.005 240); /* light text */
+    --card: oklch(0.2 0.01 240);
+    --card-foreground: oklch(0.95 0.005 240);
+    --popover: oklch(0.2 0.01 240);
+    --popover-foreground: oklch(0.95 0.005 240);
+    --primary: oklch(0.7 0.1 200); /* lighter ProHealth accent for dark mode */
+    --primary-foreground: oklch(0.15 0.01 240);
+    --secondary: oklch(0.25 0.01 240);
+    --secondary-foreground: oklch(0.95 0.005 240);
+    --muted: oklch(0.25 0.01 240);
+    --muted-foreground: oklch(0.7 0.01 240);
+    --accent: oklch(0.7 0.1 200); /* ProHealth light blue for dark mode */
+    --accent-foreground: oklch(0.15 0.01 240);
+    --destructive: oklch(0.6 0.2 25);
+    --destructive-foreground: oklch(0.95 0.005 240);
+    --border: oklch(0.3 0.01 240);
+    --input: oklch(0.25 0.01 240);
+    --ring: oklch(0.7 0.1 200);
+    --chart-1: oklch(0.7 0.1 200); /* ProHealth accent */
+    --chart-2: oklch(0.6 0.15 240); /* ProHealth primary */
+    --chart-3: oklch(0.8 0.05 180);
+    --chart-4: oklch(0.75 0.08 160);
+    --chart-5: oklch(0.65 0.12 200);
+    --sidebar: oklch(0.18 0.01 240);
+    --sidebar-foreground: oklch(0.95 0.005 240);
+    --sidebar-primary: oklch(0.7 0.1 200);
+    --sidebar-primary-foreground: oklch(0.15 0.01 240);
+    --sidebar-accent: oklch(0.3 0.02 240);
+    --sidebar-accent-foreground: oklch(0.95 0.005 240);
+    --sidebar-border: oklch(0.3 0.01 240);
+    --sidebar-ring: oklch(0.7 0.1 200);
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-background text-foreground;
+        font-family: 'Poppins', sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 1.625em;
+        color: var(--prohealth-secondary);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Figtree', sans-serif;
+        font-weight: 700;
+        line-height: 1.2em;
+        color: var(--prohealth-primary);
+        margin: 0 0 20px 0;
+        padding: 0;
+    }
+
+    h1 { font-size: 56px; }
+    h2 { font-size: 42px; }
+    h3 { font-size: 30px; }
+    h4 { font-size: 24px; }
+    h5 { font-size: 18px; }
+    h6 { font-size: 16px; }
+
+    @media screen and (max-width: 991px) {
+        h2 { font-size: 36px; }
+        body { font-size: 16px; line-height: 1.6em; }
+    }
+}
+
+/* ProHealth Theme Utilities */
+@layer utilities {
+    .cs_primary_font { font-family: 'Poppins', sans-serif; }
+    .cs_secondary_font { font-family: 'Poppins', sans-serif; }
+
+    .cs_heading_color { color: var(--prohealth-primary); }
+    .cs_body_color { color: var(--prohealth-secondary); }
+    .cs_accent_color { color: var(--prohealth-accent); }
+    .cs_white_color { color: var(--prohealth-white); }
+
+    .cs_accent_bg { background-color: var(--prohealth-accent); }
+    .cs_white_bg { background-color: var(--prohealth-white); }
+    .cs_gray_bg_1 { background-color: rgba(210, 234, 239, 0.2); }
+
+    .cs_shadow_1 { box-shadow: 0px 4px 21px 1px rgba(48, 123, 196, 0.1); }
+    .cs_shadow_2 { box-shadow: 6px 4px 70px 8px rgba(48, 123, 196, 0.09); }
+
+    .cs_radius_20 { border-radius: 20px; }
+    .cs_radius_25 { border-radius: 25px; }
+    .cs_radius_30 { border-radius: 30px; }
+
+    .cs_fs_72 {
+        font-size: 72px;
+        line-height: 1.14em;
+    }
+    .cs_fs_48 {
+        font-size: 48px;
+        line-height: 1.04em;
+    }
+    .cs_fs_32 {
+        font-size: 32px;
+        line-height: 1.31em;
+    }
+    .cs_fs_24 {
+        font-size: 24px;
+        line-height: 1.41em;
+    }
+
+    @media (max-width: 1700px) {
+        .cs_fs_72 { font-size: 56px; }
+        .cs_fs_48 { font-size: 36px; }
+        .cs_fs_32 { font-size: 26px; }
+        .cs_fs_24 { font-size: 22px; }
+    }
+
+    @media (max-width: 991px) {
+        .cs_fs_72 { font-size: 50px; }
+        .cs_fs_48 { font-size: 26px; }
+        .cs_fs_32 { font-size: 24px; }
+    }
+
+    .cs_semibold { font-weight: 600; }
+    .cs_bold { font-weight: 700; }
+    .cs_medium { font-weight: 500; }
+    .cs_normal { font-weight: 400; }
+}
+
+/* ProHealth Button Styles */
+@layer components {
+    .cs_btn {
+        font-family: 'Figtree', sans-serif;
+        font-weight: 500;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 40px;
+        border-radius: 24px;
+        outline: none;
+        border: none;
+        position: relative;
+        background: transparent;
+        transition: all 0.4s ease-in-out;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .cs_btn.cs_style_1 {
+        color: white;
+        box-shadow: 0px 4px 20px 0px rgba(39, 71, 96, 0.17);
+    }
+
+    .cs_btn.cs_style_1::before {
+        content: '';
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        border-radius: inherit;
+        left: 0;
+        top: 0;
+        background: linear-gradient(134deg, var(--prohealth-accent) 0%, var(--prohealth-primary) 100%);
+        transition: all 0.4s ease-in-out;
+    }
+
+    .cs_btn.cs_style_1::after {
+        content: '';
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        border-radius: inherit;
+        left: 0;
+        top: 0;
+        background: linear-gradient(270deg, var(--prohealth-accent) 0%, var(--prohealth-primary) 100%);
+        opacity: 0;
+        transition: all 0.4s ease-in-out;
+    }
+
+    .cs_btn.cs_style_1:hover::after {
+        opacity: 1;
+    }
+
+    .cs_btn.cs_style_1 span {
+        position: relative;
+        z-index: 2;
+    }
+
+    /* ProHealth Form Styles */
+    .cs_form_field {
+        display: block;
+        width: 100%;
+        border-radius: 30px;
+        outline: none;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(48, 123, 196, 0.5);
+        padding: 26px 30px;
+        background-color: transparent;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .cs_form_field:focus {
+        border-color: var(--prohealth-accent);
+    }
+
+    .cs_form_field::placeholder {
+        color: var(--prohealth-secondary);
+    }
+
+    @media (max-width: 1700px) {
+        .cs_form_field {
+            padding: 16px 20px;
+            border-radius: 15px;
+        }
+        .cs_btn {
+            padding: 12px 30px;
+        }
+    }
+
+    /* ProHealth Card Styles */
+    .cs_card {
+        background: white;
+        border-radius: 25px;
+        box-shadow: 0px 4px 21px 1px rgba(48, 123, 196, 0.1);
+        padding: 40px;
+        transition: all 0.3s ease;
+    }
+
+    .cs_card:hover {
+        box-shadow: 6px 4px 70px 8px rgba(48, 123, 196, 0.09);
+        transform: translateY(-2px);
+    }
+
+    /* ProHealth Section Styles */
+    .cs_section_heading {
+        margin-bottom: 50px;
+    }
+
+    .cs_section_title {
+        font-family: 'Figtree', sans-serif;
+        font-weight: 700;
+        color: var(--prohealth-primary);
+        margin-bottom: 20px;
+    }
+
+    .cs_section_subtitle {
+        font-family: 'Figtree', sans-serif;
+        font-weight: 600;
+        color: var(--prohealth-accent);
+        text-transform: uppercase;
+        margin: 0;
+    }
+
+    /* ProHealth Responsive Utilities */
+    @media (max-width: 768px) {
+        .cs_fs_72 { font-size: 42px !important; }
+        .cs_fs_48 { font-size: 32px !important; }
+        .cs_fs_32 { font-size: 24px !important; }
+        .cs_fs_24 { font-size: 20px !important; }
+        .cs_fs_20 { font-size: 18px !important; }
+
+        .cs_btn {
+            padding: 10px 24px;
+            font-size: 14px;
+        }
+
+        .cs_form_field {
+            padding: 16px 20px;
+            font-size: 14px;
+        }
+
+        .cs_card {
+            padding: 24px;
+        }
+    }
+
+    /* ProHealth Animation Utilities */
+    .cs_fade_in {
+        animation: fadeIn 0.6s ease-in-out;
+    }
+
+    .cs_slide_up {
+        animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ProHealth Authentication Page Enhancements */
+    .auth-page {
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .auth-page .auth-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        line-height: 1.2;
+    }
+
+    .auth-page .auth-subtitle {
+        font-size: 1.125rem;
+        letter-spacing: 0.025em;
+        line-height: 1.6;
+    }
+
+    .auth-page .auth-label {
+        font-size: 1rem;
+        font-weight: 500;
+        letter-spacing: 0.025em;
+    }
+
+    .auth-page .auth-input {
+        font-size: 1.125rem;
+        padding: 1rem 1.25rem;
+        letter-spacing: 0.025em;
+    }
+
+    .auth-page .auth-button {
+        font-size: 1.125rem;
+        font-weight: 600;
+        padding: 1rem 2rem;
+        letter-spacing: 0.025em;
+    }
+
+    .auth-page .auth-container {
+        padding: 3rem;
+        max-width: 28rem;
+    }
+
+    /* ProHealth Focus States */
+    .cs_btn:focus-visible,
+    .cs_form_field:focus {
+        outline: 2px solid var(--prohealth-accent);
+        outline-offset: 2px;
+    }
+
+    /* ProHealth Loading States */
+    .cs_loading {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cs_loading::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+        animation: loading 1.5s infinite;
+    }
+
+    @keyframes loading {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+}

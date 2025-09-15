@@ -1,0 +1,41 @@
+{
+  "name": "eRefer Kenya Healthcare System",
+  "short_name": "eRefer Kenya",
+  "description": "Comprehensive healthcare referral and emergency management system for Kenya",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#274760",
+  "theme_color": "#274760",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "32x32",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.svg",
+      "sizes": "180x180",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "medical", "emergency", "healthcare"],
+  "lang": "en-KE",
+  "scope": "/",
+  "screenshots": [
+    {
+      "src": "/images/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/images/screenshot-mobile.png", 
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ]
+}
