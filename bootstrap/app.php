@@ -27,6 +27,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => AdminMiddleware::class,
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'enhanced.role' => \App\Http\Middleware\EnhancedRoleMiddleware::class,
+            'permission' => \App\Http\Middleware\PermissionMiddleware::class,
             'patient' => \App\Http\Middleware\PatientMiddleware::class,
             'doctor' => \App\Http\Middleware\DoctorMiddleware::class,
             'ambulance' => \App\Http\Middleware\AmbulanceMiddleware::class,

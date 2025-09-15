@@ -1,496 +1,512 @@
-import React, { useState, useEffect } from 'react';
-import { Head } from '@inertiajs/react';
-import AppLayout from '@/layouts/AppLayout';
-import {
-  Stethoscope,
-  FileText,
-  Users,
-  Clock,
-  Calendar,
-  Send,
-  CheckCircle,
+import React, { useState, useEffect } from 'react'
+import { Head, Link } from '@inertiajs/react'
+import DoctorLayout from '@/layouts/DoctorLayout'
+import { 
+  Users, 
+  Calendar, 
+  FileText, 
+  Clock, 
   AlertCircle,
-  Plus,
-  Heart,
+  CheckCircle,
   Activity,
+  Stethoscope,
+  Heart,
+  Brain,
+  Plus,
+  ArrowRight,
   TrendingUp,
-  Phone,
-  Video,
-  MessageSquare,
-  Clipboard,
-  Pill,
-  Eye,
-  Edit,
-  UserCheck,
-  AlertTriangle,
-  ThermometerSun,
-  Zap,
-  BookOpen,
-  Award
-} from 'lucide-react';
-import {
-  MetricCard,
-  DashboardWidget,
-  AlertsManager,
-  QuickActions,
-  RecentActivity,
-  ChartWidget
-} from '@/components/dashboard/shared';
-import { ProHealthCard, ProHealthStatCard, ProHealthButton } from '@/components/prohealth';
-import { type BreadcrumbItem } from '@/types';
+  UserCheck
+} from 'lucide-react'
 
-const breadcrumbs: BreadcrumbItem[] = [
-  { title: 'Dashboard', href: '/dashboard' },
-  { title: 'Doctor', href: '/dashboards/doctor' },
-];
-
-interface DoctorDashboardProps {
-  auth: {
-    user: {
-      id: number;
-      first_name: string;
-      last_name: string;
-      email: string;
-      role: string;
-      specialty?: string;
-      license_number?: string;
-      facility_name?: string;
-    };
-  };
+interface PatientQueueItem {
+  id: number
+  name: string
+  age: number
+  condition: string
+  priority: 'urgent' | 'high' | 'normal' | 'low'
+  appointment_time: string
+  status: 'waiting' | 'in_progress' | 'completed'
 }
 
-export default function DoctorDashboard({ auth }: DoctorDashboardProps) {
-  const { user } = auth;
-  const [stats, setStats] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+interface Appointment {
+  id: number
+  patient_name: string
+  time: string
+  type: string
+  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled'
+}
+
+interface Referral {
+  id: number
+  patient_name: string
+  specialty: string
+  status: 'pending' | 'approved' | 'rejected'
+  created_at: string
+  urgency: 'urgent' | 'routine'
+}
+
+interface DoctorDashboardStats {
+  patient_queue: PatientQueueItem[]
+  appointments_today: Appointment[]
+  pending_referrals: Referral[]
+  clinical_metrics: {
+    patients_seen_today: number
+    patients_seen_week: number
+    avg_consultation_time: number
+    patient_satisfaction: number
+    pending_lab_results: number
+    follow_ups_due: number
+  }
+  recent_patients: Array<{
+    id: number
+    name: string
+    last_visit: string
+    diagnosis: string
+    status: string
+  }>
+}
+
+interface EnhancedDoctorDashboardProps {
+  stats: DoctorDashboardStats
+  user: any
+  doctor: any
+}
+
+export default function EnhancedDoctorDashboard({ stats, user, doctor }: EnhancedDoctorDashboardProps) {
+  const [currentTime, setCurrentTime] = useState(new Date())
 
   useEffect(() => {
-    // Mock data for demonstration
-    const mockStats = {
-      doctorName: `Dr. ${user.first_name} ${user.last_name}`,
-      specialty: user.specialty || 'Internal Medicine',
-      licenseNumber: user.license_number || 'MD12345',
-      facilityName: user.facility_name || 'Nairobi General Hospital',
-      totalReferrals: 145,
-      pendingReferrals: 8,
-      completedReferrals: 128,
-      urgentReferrals: 3,
-      todayAppointments: 12,
-      upcomingAppointments: 25,
-      totalPatients: 342,
-      activePrescriptions: 67,
-      consultationsToday: 8,
-      consultationsCompleted: 6,
-      averageConsultationTime: 18,
-      patientSatisfactionScore: 4.8,
-      responseTime: '15 min',
-      successRate: 94.2,
-      monthlyConsultations: 189,
-      referralAcceptanceRate: 89.5,
-    };
+    const timer = setInterval(() => {
+      setCurrentTime(new Date())
+    }, 60000) // Update every minute
 
-    setStats(mockStats);
-    setLoading(false);
-  }, []);
+    return () => clearInterval(timer)
+  }, [])
 
-  const weeklyScheduleData = [
-    { name: 'Mon', consultations: 8, surgeries: 2 },
-    { name: 'Tue', consultations: 12, surgeries: 1 },
-    { name: 'Wed', consultations: 10, surgeries: 3 },
-    { name: 'Thu', consultations: 15, surgeries: 1 },
-    { name: 'Fri', consultations: 11, surgeries: 2 },
-    { name: 'Sat', consultations: 6, surgeries: 0 },
-  ];
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'urgent':
+        return 'bg-red-100 text-red-800 border-red-200'
+      case 'high':
+        return 'bg-orange-100 text-orange-800 border-orange-200'
+      case 'normal':
+        return 'bg-blue-100 text-blue-800 border-blue-200'
+      case 'low':
+        return 'bg-gray-100 text-gray-800 border-gray-200'
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200'
+    }
+  }
 
-  const referralTrendsData = [
-    { name: 'Jan', incoming: 12, outgoing: 18 },
-    { name: 'Feb', incoming: 15, outgoing: 22 },
-    { name: 'Mar', incoming: 18, outgoing: 25 },
-    { name: 'Apr', incoming: 14, outgoing: 20 },
-    { name: 'May', incoming: 20, outgoing: 28 },
-    { name: 'Jun', incoming: 16, outgoing: 24 },
-  ];
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'waiting':
+        return 'bg-yellow-100 text-yellow-800'
+      case 'in_progress':
+        return 'bg-blue-100 text-blue-800'
+      case 'completed':
+        return 'bg-green-100 text-green-800'
+      case 'scheduled':
+        return 'bg-blue-100 text-blue-800'
+      case 'cancelled':
+        return 'bg-red-100 text-red-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
+    }
+  }
 
-  const patientConditionsData = [
-    { name: 'Hypertension', value: 35 },
-    { name: 'Diabetes', value: 28 },
-    { name: 'Cardiac Issues', value: 22 },
-    { name: 'Respiratory', value: 18 },
-    { name: 'Other', value: 45 },
-  ];
+  const formatTime = (timeString: string) => {
+    return new Date(timeString).toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    })
+  }
 
-  const alerts = [
-    {
-      id: '1',
-      type: 'warning' as const,
-      title: 'Urgent Referral Pending',
-      message: 'Chest pain patient awaiting cardiac consultation approval.',
-      timestamp: '5 min ago',
-      source: 'Emergency Department',
-      urgent: true,
-      actionLabel: 'Review Referral',
-    },
-    {
-      id: '2',
-      type: 'info' as const,
-      title: 'Lab Results Available',
-      message: 'Blood work results for Patient #4521 are ready for review.',
-      timestamp: '20 min ago',
-      source: 'Laboratory',
-      actionLabel: 'View Results',
-    },
-    {
-      id: '3',
-      type: 'warning' as const,
-      title: 'Medication Alert',
-      message: 'Drug interaction warning for Patient #3892.',
-      timestamp: '45 min ago',
-      source: 'Pharmacy System',
-      urgent: true,
-      actionLabel: 'Review Prescription',
-    },
-  ];
+  const getTimeStatus = (appointmentTime: string) => {
+    const now = new Date()
+    const appointment = new Date(appointmentTime)
+    const diffMinutes = Math.floor((appointment.getTime() - now.getTime()) / 60000)
 
-  const quickActions = [
-    {
-      id: 'new-referral',
-      label: 'Create Referral',
-      description: 'Refer patient to specialist',
-      icon: Send,
-      href: '/doctor/referrals/create',
-      color: 'blue' as const,
-    },
-    {
-      id: 'view-schedule',
-      label: 'View Schedule',
-      description: 'Check appointments & availability',
-      icon: Calendar,
-      href: '/doctor/schedule',
-      color: 'green' as const,
-    },
-    {
-      id: 'patient-records',
-      label: 'Patient Records',
-      description: 'Access medical histories',
-      icon: Clipboard,
-      href: '/doctor/patients',
-      color: 'purple' as const,
-    },
-    {
-      id: 'prescriptions',
-      label: 'Prescriptions',
-      description: 'Manage medications',
-      icon: Pill,
-      href: '/doctor/prescriptions',
-      color: 'orange' as const,
-    },
-    {
-      id: 'video-consult',
-      label: 'Video Consultation',
-      description: 'Start remote consultation',
-      icon: Video,
-      href: '/doctor/telemedicine',
-      color: 'red' as const,
-    },
-    {
-      id: 'clinical-notes',
-      label: 'Clinical Notes',
-      description: 'Review and update notes',
-      icon: BookOpen,
-      href: '/doctor/notes',
-      color: 'gray' as const,
-    },
-  ];
-
-  const recentActivities = [
-    {
-      id: '1',
-      type: 'referral' as const,
-      title: 'Referral Approved',
-      description: 'Cardiac consultation for John Doe approved and scheduled',
-      timestamp: '10 min ago',
-      user: 'Dr. Sarah Kamau',
-      status: 'completed' as const,
-    },
-    {
-      id: '2',
-      type: 'appointment' as const,
-      title: 'Consultation Completed',
-      description: 'Follow-up appointment with Mary Wanjiku completed',
-      timestamp: '25 min ago',
-      user: 'You',
-      status: 'completed' as const,
-    },
-    {
-      id: '3',
-      type: 'patient' as const,
-      title: 'Lab Results Reviewed',
-      description: 'Blood work results for Patient #3456 reviewed and documented',
-      timestamp: '45 min ago',
-      user: 'You',
-      status: 'completed' as const,
-    },
-    {
-      id: '4',
-      type: 'referral' as const,
-      title: 'New Referral Request',
-      description: 'Orthopedic consultation requested for sports injury',
-      timestamp: '1 hour ago',
-      user: 'Dr. James Mwangi',
-      status: 'pending' as const,
-      priority: 'medium' as const,
-    },
-    {
-      id: '5',
-      type: 'appointment' as const,
-      title: 'Prescription Updated',
-      description: 'Medication dosage adjusted for diabetes patient',
-      timestamp: '2 hours ago',
-      user: 'You',
-      status: 'completed' as const,
-    },
-  ];
-
-  const todayAppointments = [
-    {
-      time: '09:00',
-      patient: 'Alice Njeri',
-      type: 'Follow-up',
-      condition: 'Hypertension',
-      duration: '30 min',
-      status: 'completed',
-    },
-    {
-      time: '09:30',
-      patient: 'Peter Kamau',
-      type: 'Consultation',
-      condition: 'Diabetes',
-      duration: '45 min',
-      status: 'completed',
-    },
-    {
-      time: '10:30',
-      patient: 'Grace Wanjiku',
-      type: 'New Patient',
-      condition: 'Chest Pain',
-      duration: '60 min',
-      status: 'in-progress',
-    },
-    {
-      time: '11:30',
-      patient: 'David Mwangi',
-      type: 'Follow-up',
-      condition: 'Post-surgery',
-      duration: '30 min',
-      status: 'scheduled',
-    },
-    {
-      time: '14:00',
-      patient: 'Sarah Akinyi',
-      type: 'Consultation',
-      condition: 'Respiratory',
-      duration: '45 min',
-      status: 'scheduled',
-    },
-  ];
-
-  if (loading) {
-    return (
-      <AppLayout user={user} breadcrumbs={breadcrumbs}>
-        <Head title="Doctor Dashboard" />
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        </div>
-      </AppLayout>
-    );
+    if (diffMinutes < -15) return { status: 'overdue', color: 'text-red-600' }
+    if (diffMinutes < 0) return { status: 'current', color: 'text-green-600' }
+    if (diffMinutes < 15) return { status: 'upcoming', color: 'text-orange-600' }
+    return { status: 'scheduled', color: 'text-gray-600' }
   }
 
   return (
-    <AppLayout user={user} breadcrumbs={breadcrumbs}>
-      <Head title="Doctor Dashboard - eRefer System" />
-
+    <DoctorLayout user={user}>
+      <Head title="Doctor Dashboard" />
+      
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        {/* Dashboard Header */}
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="cs_fs_32 cs_primary_font cs_bold cs_heading_color">{stats.doctorName}</h1>
-            <p className="cs_body_color cs_secondary_font cs_fs_16">{stats.specialty} • {stats.facilityName}</p>
-            <div className="flex items-center gap-4 mt-3">
-              <span className="inline-flex items-center gap-2 px-4 py-2 cs_radius_15 bg-green-100 text-green-800 cs_fs_14 cs_semibold">
-                <UserCheck className="h-4 w-4" />
-                On Duty
-              </span>
-              <span className="cs_fs_14 cs_body_color cs_secondary_font">
-                License: {stats.licenseNumber}
-              </span>
-            </div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Good {currentTime.getHours() < 12 ? 'Morning' : currentTime.getHours() < 18 ? 'Afternoon' : 'Evening'}, Dr. {user.last_name}
+            </h1>
+            <p className="text-gray-600 mt-1">
+              {currentTime.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })}
+            </p>
           </div>
-          <div className="flex items-center gap-3">
-            <ProHealthButton variant="outline" icon={Calendar}>
-              View Schedule
-            </ProHealthButton>
-            <ProHealthButton variant="primary" icon={Plus}>
+          
+          <div className="flex items-center gap-4">
+            <Link
+              href="/admin/patients/create"
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <Plus className="h-4 w-4" />
+              Add Patient
+            </Link>
+            <Link
+              href="/admin/referrals/create"
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <FileText className="h-4 w-4" />
               New Referral
-            </ProHealthButton>
+            </Link>
           </div>
         </div>
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <ProHealthStatCard
-            value={stats.todayAppointments.toString()}
-            label="Today's Appointments"
-            trend={`${stats.consultationsCompleted} completed`}
-            icon={Calendar}
-          />
-          <ProHealthStatCard
-            value={stats.pendingReferrals.toString()}
-            label="Pending Referrals"
-            trend={stats.urgentReferrals > 0 ? `${stats.urgentReferrals} urgent` : 'All up to date'}
-            icon={FileText}
-          />
-          <ProHealthStatCard
-            value={stats.totalPatients.toString()}
-            label="Active Patients"
-            trend={`${stats.activePrescriptions} prescriptions`}
-            icon={Users}
-          />
-          <ProHealthStatCard
-            value={stats.responseTime}
-            label="Avg Response Time"
-            trend="Within target"
-            icon={Clock}
-          />
-          <ProHealthStatCard
-            value={`${stats.patientSatisfactionScore}/5.0`}
-            label="Patient Satisfaction"
-            trend={`${stats.successRate}% success rate`}
-            icon={Heart}
-          />
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Patients Today</p>
+                <p className="text-3xl font-bold text-gray-900">{stats.clinical_metrics.patients_seen_today}</p>
+                <p className="text-sm text-green-600 mt-1">
+                  {stats.patient_queue.filter(p => p.status === 'waiting').length} waiting
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Users className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Appointments</p>
+                <p className="text-3xl font-bold text-gray-900">{stats.appointments_today.length}</p>
+                <p className="text-sm text-blue-600 mt-1">
+                  {stats.appointments_today.filter(a => a.status === 'scheduled').length} scheduled
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <Calendar className="h-6 w-6 text-green-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Pending Referrals</p>
+                <p className="text-3xl font-bold text-gray-900">{stats.pending_referrals.length}</p>
+                <p className="text-sm text-orange-600 mt-1">
+                  {stats.pending_referrals.filter(r => r.urgency === 'urgent').length} urgent
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                <FileText className="h-6 w-6 text-orange-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Satisfaction</p>
+                <p className="text-3xl font-bold text-gray-900">{stats.clinical_metrics.patient_satisfaction}%</p>
+                <p className="text-sm text-green-600 mt-1">Patient rating</p>
+              </div>
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <Heart className="h-6 w-6 text-purple-600" />
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Schedule and Referral Trends */}
+        {/* Patient Queue and Today's Appointments */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ChartWidget
-            title="Weekly Schedule"
-            subtitle="Consultations and procedures"
-            data={weeklyScheduleData}
-            type="bar"
-            height={300}
-            showTrend={true}
-            trendValue={15}
-            trendPeriod="vs last week"
-          />
+          {/* Patient Queue */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Users className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Patient Queue</h3>
+                  <p className="text-sm text-gray-600">Current waiting patients</p>
+                </div>
+              </div>
+              <Link
+                href="/admin/patients"
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1"
+              >
+                View All
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
 
-          <ChartWidget
-            title="Referral Trends"
-            subtitle="Incoming vs outgoing referrals"
-            data={referralTrendsData}
-            type="line"
-            height={300}
-            showTrend={true}
-            trendValue={12}
-            trendPeriod="this month"
-          />
-        </div>
-
-        {/* Today's Schedule and Patient Conditions */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ProHealthCard
-            title="Today's Schedule"
-            subtitle="Upcoming appointments and consultations"
-            icon={Clock}
-            className="p-6"
-          >
-            <div className="space-y-4">
-              {todayAppointments.map((appointment, index) => (
-                <div key={index} className="flex items-center justify-between p-4 border border-gray-200 cs_radius_15 hover:cs_shadow_1 transition-all">
-                  <div className="flex items-center space-x-4">
-                    <div className="cs_fs_14 cs_semibold cs_accent_color min-w-max">
-                      {appointment.time}
+            <div className="space-y-4 max-h-80 overflow-y-auto">
+              {stats.patient_queue.map((patient) => {
+                const timeStatus = getTimeStatus(patient.appointment_time)
+                return (
+                  <div key={patient.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
+                        {patient.name.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">{patient.name}</p>
+                        <p className="text-sm text-gray-600">Age {patient.age} • {patient.condition}</p>
+                        <p className={`text-xs font-medium ${timeStatus.color}`}>
+                          {formatTime(patient.appointment_time)}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="cs_fs_14 cs_semibold cs_heading_color">{appointment.patient}</p>
-                      <p className="cs_fs_12 cs_body_color cs_secondary_font">
-                        {appointment.type} • {appointment.condition}
-                      </p>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getPriorityColor(patient.priority)}`}>
+                        {patient.priority}
+                      </span>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(patient.status)}`}>
+                        {patient.status.replace('_', ' ')}
+                      </span>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <span className="cs_fs_12 cs_body_color">{appointment.duration}</span>
-                    <span className={`px-3 py-1 cs_radius_15 cs_fs_12 cs_semibold ${
-                      appointment.status === 'completed' ? 'bg-green-100 text-green-800' :
-                      appointment.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
+                )
+              })}
+
+              {stats.patient_queue.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p>No patients in queue</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Today's Appointments */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <Calendar className="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Today's Appointments</h3>
+                  <p className="text-sm text-gray-600">Scheduled consultations</p>
+                </div>
+              </div>
+              <Link
+                href="/admin/appointments"
+                className="text-green-600 hover:text-green-700 text-sm font-medium flex items-center gap-1"
+              >
+                View All
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="space-y-4 max-h-80 overflow-y-auto">
+              {stats.appointments_today.map((appointment) => (
+                <div key={appointment.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full" />
+                    <div>
+                      <p className="font-medium text-gray-900">{appointment.patient_name}</p>
+                      <p className="text-sm text-gray-600">{appointment.type}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-gray-900">
+                      {formatTime(appointment.time)}
+                    </p>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(appointment.status)}`}>
                       {appointment.status}
                     </span>
                   </div>
                 </div>
               ))}
+
+              {stats.appointments_today.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <Calendar className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p>No appointments scheduled</p>
+                </div>
+              )}
             </div>
-          </ProHealthCard>
-
-          <ChartWidget
-            title="Patient Conditions"
-            subtitle="Distribution of treated conditions"
-            data={patientConditionsData}
-            type="pie"
-            height={300}
-          />
+          </div>
         </div>
 
-        {/* Quick Actions and Activity */}
+        {/* Clinical Performance and Pending Tasks */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <QuickActions
-            title="Clinical Tools"
-            actions={quickActions}
-            columns={2}
-          />
+          {/* Clinical Performance */}
+          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <Activity className="h-5 w-5 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Clinical Performance</h3>
+                <p className="text-sm text-gray-600">Your practice metrics</p>
+              </div>
+            </div>
 
-          <RecentActivity
-            title="Recent Activity"
-            activities={recentActivities}
-            maxItems={6}
-            showUser={true}
-            showStatus={true}
-          />
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="text-center p-4 bg-blue-50 rounded-lg">
+                <div className="flex items-center justify-center mb-2">
+                  <UserCheck className="h-6 w-6 text-blue-500" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900">
+                  {stats.clinical_metrics.patients_seen_week}
+                </div>
+                <div className="text-sm text-gray-600">Patients This Week</div>
+              </div>
 
-          <AlertsManager
-            alerts={alerts}
-            maxVisible={5}
-            showTimestamp={true}
-          />
+              <div className="text-center p-4 bg-green-50 rounded-lg">
+                <div className="flex items-center justify-center mb-2">
+                  <Clock className="h-6 w-6 text-green-500" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900">
+                  {stats.clinical_metrics.avg_consultation_time}m
+                </div>
+                <div className="text-sm text-gray-600">Avg Consultation</div>
+              </div>
+
+              <div className="text-center p-4 bg-purple-50 rounded-lg">
+                <div className="flex items-center justify-center mb-2">
+                  <Heart className="h-6 w-6 text-purple-500" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900">
+                  {stats.clinical_metrics.patient_satisfaction}%
+                </div>
+                <div className="text-sm text-gray-600">Satisfaction</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Pending Tasks */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                <AlertCircle className="h-5 w-5 text-orange-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Pending Tasks</h3>
+                <p className="text-sm text-gray-600">Items requiring attention</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-red-600" />
+                  <span className="text-sm font-medium text-red-900">Lab Results</span>
+                </div>
+                <span className="text-lg font-bold text-red-600">
+                  {stats.clinical_metrics.pending_lab_results}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-yellow-600" />
+                  <span className="text-sm font-medium text-yellow-900">Follow-ups Due</span>
+                </div>
+                <span className="text-lg font-bold text-yellow-600">
+                  {stats.clinical_metrics.follow_ups_due}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-200">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-orange-600" />
+                  <span className="text-sm font-medium text-orange-900">Referrals</span>
+                </div>
+                <span className="text-lg font-bold text-orange-600">
+                  {stats.pending_referrals.length}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Performance Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <ProHealthStatCard
-            value={`${stats.averageConsultationTime} min`}
-            label="Avg Consultation Time"
-            trend="2 min improvement"
-            icon={Clock}
-          />
-          <ProHealthStatCard
-            value={stats.responseTime}
-            label="Response Time"
-            trend="Average referral response"
-            icon={Zap}
-          />
-          <ProHealthStatCard
-            value={stats.monthlyConsultations.toString()}
-            label="Monthly Consultations"
-            trend="+18% vs last month"
-            icon={Activity}
-          />
-          <ProHealthStatCard
-            value={`${stats.referralAcceptanceRate}%`}
-            label="Referral Acceptance"
-            trend="+3.2% vs last month"
-            icon={Award}
-          />
+        {/* Recent Patients */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                <Stethoscope className="h-5 w-5 text-indigo-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Recent Patients</h3>
+                <p className="text-sm text-gray-600">Latest consultations and follow-ups</p>
+              </div>
+            </div>
+            <Link
+              href="/admin/patients"
+              className="text-indigo-600 hover:text-indigo-700 text-sm font-medium flex items-center gap-1"
+            >
+              View All Patients
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-4 font-medium text-gray-700">Patient</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700">Last Visit</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700">Diagnosis</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700">Status</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stats.recent_patients.map((patient) => (
+                  <tr key={patient.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="py-3 px-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                          {patient.name.charAt(0)}
+                        </div>
+                        <span className="font-medium text-gray-900">{patient.name}</span>
+                      </div>
+                    </td>
+                    <td className="py-3 px-4 text-sm text-gray-600">
+                      {new Date(patient.last_visit).toLocaleDateString()}
+                    </td>
+                    <td className="py-3 px-4 text-sm text-gray-900">{patient.diagnosis}</td>
+                    <td className="py-3 px-4">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(patient.status)}`}>
+                        {patient.status}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <Link
+                        href={`/admin/patients/${patient.id}`}
+                        className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                      >
+                        View Details
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </AppLayout>
-  );
+    </DoctorLayout>
+  )
 }
